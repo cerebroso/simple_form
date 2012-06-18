@@ -73,6 +73,10 @@ module SimpleForm
   mattr_accessor :form_class
   @@form_class = :simple_form
 
+  # You can define the class to be used on all forms, unless it's overridden in the view
+  mattr_accessor :default_form_class
+  @@default_form_class = nil
+
   # You can define which elements should obtain additional classes
   mattr_accessor :generate_additional_classes_for
   @@generate_additional_classes_for = [:wrapper, :label, :input]
