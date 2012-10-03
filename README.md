@@ -53,7 +53,7 @@ For more information see the generator output, our
 are invoked to create a complete html input for you, which by default contains label, hints, errors
 and the input itself. It does not aim to create a lot of different logic from the default Rails
 form helpers, as they do a great work by themselves. Instead, **SimpleForm** acts as a DSL and just
-maps your input type (retrieved from the column definition in the database) to an specific helper method.
+maps your input type (retrieved from the column definition in the database) to a specific helper method.
 
 To start using **SimpleForm** you just have to use the helper it provides:
 
@@ -130,8 +130,11 @@ any html attribute to that wrapper as well using the `:wrapper_html` option, lik
 <% end %>
 ```
 
-By default all inputs are required, which means an * is prepended to the label, but you can disable
-it in any input you want:
+Required fields are marked with an * prepended to their labels.
+
+By default all inputs are required. When the form object has `presence` validations attached to its fields, **SimpleForm** tells required and optional fields apart. For performance reasons, this detection is skipped on validations that make use of conditional options, such as `:if` and `:unless`.
+
+And of course, the `required` property of any input can be overwritten as needed:
 
 ```erb
 <%= simple_form_for @user do |f| %>
@@ -315,6 +318,12 @@ the collection by hand, all together with the prompt:
 f.association :company, :collection => Company.active.all(:order => 'name'), :prompt => "Choose a Company"
 ```
 
+In case you want to declare different labels and values:
+
+```ruby
+f.association :company, :label_method => :company_name, :value_method => :id, :include_blank => false
+```
+
 ### Buttons
 
 All web forms need buttons, right? **SimpleForm** wraps them in the DSL, acting like a proxy:
@@ -464,7 +473,7 @@ instance, if you want to wrap date/time/datetime in a div, you can do:
 # app/inputs/date_time_input.rb
 class DateTimeInput < SimpleForm::Inputs::DateTimeInput
   def input
-    "<div>#{super}</div>".html_safe
+    template.content_tag(:div, super)
   end
 end
 ```
@@ -593,7 +602,7 @@ en:
       user:
         gender:
           male: 'Male'
-          female: "Female'
+          female: 'Female'
 ```
 
 You can also use the `defaults` key as you would do with labels, hints and placeholders. It is
@@ -844,6 +853,7 @@ https://github.com/plataformatec/simple_form/issues
 * José Valim (https://github.com/josevalim)
 * Carlos Antonio da Silva (https://github.com/carlosantoniodasilva)
 * Rafael Mendonça França (https://github.com/rafaelfranca)
+* Vasiliy Ermolovich (https://github.com/nashby)
 
 ## License
 

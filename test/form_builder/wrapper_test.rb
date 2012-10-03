@@ -75,6 +75,15 @@ class WrapperTest < ActionView::TestCase
     end
   end
 
+  test 'wrapper should not generate empty css class' do
+    swap SimpleForm, :generate_additional_classes_for => [:input, :label] do
+      swap_wrapper :default, custom_wrapper_without_class do
+        with_form_for @user, :name
+        assert_no_select 'div#custom_wrapper_without_class[class]'
+      end
+    end
+  end
+
   # Custom wrapper test
 
   test 'custom wrappers works' do
@@ -157,6 +166,16 @@ class WrapperTest < ActionView::TestCase
   test 'raise error when wrapper not found' do
     assert_raise SimpleForm::WrapperNotFound do
       with_form_for @user, :name, :wrapper => :not_found
+    end
+  end
+
+  test 'use wrapper for specified in config mapping' do
+    swap_wrapper :another do
+      swap SimpleForm, :wrapper_mappings => { :string => :another } do
+        with_form_for @user, :name
+        assert_select "section.custom_wrapper div.another_wrapper label"
+        assert_select "section.custom_wrapper div.another_wrapper input.string"
+      end
     end
   end
 end

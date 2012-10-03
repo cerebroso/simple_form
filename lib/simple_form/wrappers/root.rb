@@ -24,10 +24,10 @@ module SimpleForm
 
       def html_classes(input, options)
         css = options[:wrapper_class] ? Array.wrap(options[:wrapper_class]) : @defaults[:class]
-        css += SimpleForm.additional_classes_for(:wrapper) { input.html_classes }
+        css += SimpleForm.additional_classes_for(:wrapper) { input.additional_classes }
         css << (options[:wrapper_error_class] || @defaults[:error_class]) if input.has_errors?
         css << (options[:wrapper_hint_class] || @defaults[:hint_class]) if input.has_hint?
-        css
+        css.compact
       end
     end
   end

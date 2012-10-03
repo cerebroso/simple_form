@@ -46,6 +46,15 @@ class FormBuilderTest < ActionView::TestCase
     end
   end
 
+  test 'builder should allow to add additional classes only for wrapper' do
+    swap SimpleForm, :generate_additional_classes_for => [:wrapper] do
+      with_form_for @user, :post_count
+      assert_no_select "form input#user_post_count.string"
+      assert_no_select "form label#user_post_count.string"
+      assert_select "form div.input.string"
+    end
+  end
+
   test 'builder should allow adding custom input mappings for integer input types' do
     swap SimpleForm, :input_mappings => { /lock_version/ => :hidden } do
       with_form_for @user, :lock_version
@@ -200,6 +209,22 @@ class FormBuilderTest < ActionView::TestCase
     with_form_for @user, :name, :input_html => { :class => 'my_input', :id => 'my_input' }
     assert_no_select 'form div.input.my_input.string'
     assert_select 'form input#my_input.my_input.string'
+  end
+
+  test 'builder should not propagate input options to wrapper with custom wrapper' do
+    swap_wrapper :default, self.custom_wrapper_with_wrapped_input do
+      with_form_for @user, :name, :input_html => { :class => 'my_input' }
+      assert_no_select 'form div.input.my_input'
+      assert_select 'form input.my_input.string'
+    end
+  end
+
+  test 'builder should not propagate label options to wrapper with custom wrapper' do
+    swap_wrapper :default, self.custom_wrapper_with_wrapped_label do
+      with_form_for @user, :name, :label_html => { :class => 'my_label' }
+      assert_no_select 'form div.label.my_label'
+      assert_select 'form label.my_label.string'
+    end
   end
 
   test 'builder should generate a input with label' do
