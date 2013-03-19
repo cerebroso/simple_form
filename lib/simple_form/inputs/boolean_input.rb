@@ -4,7 +4,7 @@ module SimpleForm
       def input
         if nested_boolean_style?
           build_hidden_field_for_checkbox +
-            template.label_tag(nil, :class => "checkbox") {
+            template.label_tag(nil, class: "checkbox") {
               build_check_box_without_hidden_field + inline_label
             }
         else
@@ -49,9 +49,10 @@ module SimpleForm
       # we need the hidden field to be *outside* the label (otherwise it
       # generates invalid html - html5 only).
       def build_hidden_field_for_checkbox
-        @builder.hidden_field(attribute_name, :value => unchecked_value, :id => nil,
-                              :disabled => input_html_options[:disabled],
-                              :name => input_html_options[:name])
+        options = { value: unchecked_value, id: nil, disabled: input_html_options[:disabled] }
+        options[:name] = input_html_options[:name] if input_html_options.has_key?(:name)
+
+        @builder.hidden_field(attribute_name, options)
       end
 
       def inline_label

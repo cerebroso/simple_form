@@ -1,16 +1,13 @@
 require 'rubygems'
 require 'bundler/setup'
 
-require 'test/unit'
-require 'mocha'
+require 'minitest/autorun'
 
 require 'active_model'
 require 'action_controller'
 require 'action_view'
 require 'action_view/template'
 
-# Rails 3.0.4 is missing this "deprecation" require.
-require 'active_support/core_ext/module/deprecation'
 require 'action_view/test_case'
 
 module Rails
@@ -47,31 +44,31 @@ class ActionView::TestCase
 
   def setup_new_user(options={})
     @user = User.new({
-      :id => 1,
-      :name => 'New in SimpleForm!',
-      :description => 'Hello!',
-      :created_at => Time.now
+      id: 1,
+      name: 'New in SimpleForm!',
+      description: 'Hello!',
+      created_at: Time.now
     }.merge(options))
 
     @validating_user = ValidatingUser.new({
-      :id => 1,
-      :name => 'New in SimpleForm!',
-      :description => 'Hello!',
-      :home_picture => 'Home picture',
-      :created_at => Time.now,
-      :age => 19,
-      :amount => 15,
-      :attempts => 1,
-      :company => [1]
+      id: 1,
+      name: 'New in SimpleForm!',
+      description: 'Hello!',
+      home_picture: 'Home picture',
+      created_at: Time.now,
+      age: 19,
+      amount: 15,
+      attempts: 1,
+      company: [1]
     }.merge(options))
 
     @other_validating_user = OtherValidatingUser.new({
-      :id => 1,
-      :name => 'New in SimpleForm!',
-      :description => 'Hello!',
-      :created_at => Time.now,
-      :age => 19,
-      :company => 1
+      id: 1,
+      name: 'New in SimpleForm!',
+      description: 'Hello!',
+      created_at: Time.now,
+      age: 19,
+      company: 1
     }.merge(options))
   end
 
@@ -82,6 +79,11 @@ class ActionView::TestCase
   def user_path(*args)
     '/users'
   end
+
+  def company_user_path(*args)
+    '/company/users'
+  end
+
   alias :users_path :user_path
   alias :super_user_path :user_path
   alias :validating_user_path :user_path
