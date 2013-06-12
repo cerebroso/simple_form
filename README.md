@@ -1,7 +1,9 @@
 ![Simple Form Logo](https://raw.github.com/plataformatec/simple_form/master/simple_form.png)
 
+By [Plataformatec](http://plataformatec.com.br/).
+
 [![Gem Version](https://fury-badge.herokuapp.com/rb/simple_form.png)](http://badge.fury.io/rb/simple_form)
-[![Build Status](https://secure.travis-ci.org/plataformatec/simple_form.png?branch=master)](http://travis-ci.org/plataformatec/simple_form)
+[![Build Status](https://api.travis-ci.org/plataformatec/simple_form.png?branch=master)](http://travis-ci.org/plataformatec/simple_form)
 [![Code Climate](https://codeclimate.com/github/plataformatec/simple_form.png)](https://codeclimate.com/github/plataformatec/simple_form)
 
 Rails forms made easy.
@@ -69,7 +71,7 @@ rails generate simple_form:install --foundation
 
 Please note that the Foundation wrapper does not support the `:hint` option by default. In order to enable hints, please uncomment the appropriate line in `config/initializers/simple_form_foundation.rb`. You will need to provide your own CSS styles for hints.
 
-Please see the [instructions on how to install Foundation in a Rails app](http://foundation.zurb.com/docs/rails.php).
+Please see the [instructions on how to install Foundation in a Rails app](http://foundation.zurb.com/old-docs/f3/rails.php).
 
 ## Usage
 
@@ -230,7 +232,7 @@ The easiest way to achieve this is to use `f.input_field`.
 
 Example:
 
-```erb
+```ruby
 simple_form_for @user do |f|
   f.input_field :name
 end
@@ -238,7 +240,7 @@ end
 
 Produces:
 
-```erb
+```html
 <input class="string required" id="user_name" maxlength="100"
    name="user[name]" size="100" type="text" value="Carlos" />
 ```

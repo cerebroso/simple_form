@@ -12,6 +12,8 @@ module SimpleForm
       update: :edit
     }
 
+    ATTRIBUTE_COMPONENTS = [:html5, :min_max, :maxlength, :placeholder, :pattern, :readonly]
+
     extend MapType
     include SimpleForm::Inputs
 
@@ -135,10 +137,10 @@ module SimpleForm
     #
     def input_field(attribute_name, options={})
       options = options.dup
-      options[:input_html] = options.except(:as, :collection, :label_method, :value_method)
+      options[:input_html] = options.except(:as, :collection, :label_method, :value_method, *ATTRIBUTE_COMPONENTS)
       options = @defaults.deep_dup.deep_merge(options) if @defaults
 
-      SimpleForm::Wrappers::Root.new([:min_max, :maxlength, :placeholder, :pattern, :readonly, :input], wrapper: false).render find_input(attribute_name, options)
+      SimpleForm::Wrappers::Root.new(ATTRIBUTE_COMPONENTS + [:input], wrapper: false).render find_input(attribute_name, options)
     end
 
     # Helper for dealing with association selects/radios, generating the
@@ -180,7 +182,9 @@ module SimpleForm
 
       options[:as] ||= :select
       options[:collection] ||= options.fetch(:collection) {
-        reflection.klass.all(reflection.options.slice(:conditions, :order))
+        conditions = reflection.options[:conditions]
+        conditions = conditions.call if conditions.respond_to?(:call)
+        reflection.klass.where(conditions).order(reflection.options[:order]).to_a
       }
 
       attribute = case reflection.macro
@@ -443,7 +447,7 @@ module SimpleForm
     # route[blocks_attributes][0][blocks_learning_object_attributes][1][foo_attributes]
     # ["route", "blocks", "blocks_learning_object", "foo"]
     #
-    def lookup_model_names
+    def lookup_model_names #:nodoc:
       @lookup_model_names ||= begin
         child_index = options[:child_index]
         names = object_name.to_s.scan(/([a-zA-Z_]+)/).flatten
@@ -454,9 +458,9 @@ module SimpleForm
     end
 
     # The action to be used in lookup.
-    def lookup_action
+    def lookup_action #:nodoc:
       @lookup_action ||= begin
-        action = template.controller.action_name
+        action = template.controller && template.controller.action_name
         return unless action
         action = action.to_sym
         ACTIONS[action] || action

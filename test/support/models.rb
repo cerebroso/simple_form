@@ -1,27 +1,38 @@
 Association = Struct.new(:klass, :name, :macro, :options)
 
-class Column < Struct.new(:name, :type, :limit)
+Column = Struct.new(:name, :type, :limit) do
   # Returns +true+ if the column is either of type integer, float or decimal.
   def number?
     type == :integer || type == :float || type == :decimal
   end
 end
 
-class Company < Struct.new(:id, :name)
+Relation = Struct.new(:all) do
+  def where(conditions = nil)
+    self.class.new conditions ? all.first : all
+  end
+
+  def order(conditions = nil)
+    self.class.new conditions ? all.last : all
+  end
+
+  alias_method :to_a, :all
+end
+
+Company = Struct.new(:id, :name) do
   extend ActiveModel::Naming
   include ActiveModel::Conversion
 
-  def self.all(options={})
-    all = (1..3).map{|i| Company.new(i, "Company #{i}")}
-    return [all.first] if options[:conditions].present?
-    return [all.last]  if options[:order].present?
-    return all[0..1] if options[:include].present?
-    return all[1..2] if options[:joins].present?
-    all
+  class << self
+    delegate :order, :where, to: :_relation
   end
 
-  def self.merge_conditions(a, b)
-    (a || {}).merge(b || {})
+  def self._relation
+    Relation.new(all)
+  end
+
+  def self.all
+    (1..3).map { |i| new(i, "#{name} #{i}") }
   end
 
   def persisted?
@@ -29,14 +40,9 @@ class Company < Struct.new(:id, :name)
   end
 end
 
-class Tag < Company
-  def self.all(options={})
-    (1..3).map{|i| Tag.new(i, "Tag #{i}")}
-  end
-end
+class Tag < Company; end
 
-class TagGroup < Struct.new(:id, :name, :tags)
-end
+TagGroup = Struct.new(:id, :name, :tags)
 
 class User
   extend ActiveModel::Naming
@@ -46,7 +52,8 @@ class User
     :description, :created_at, :updated_at, :credit_limit, :password, :url,
     :delivery_time, :born_at, :special_company_id, :country, :tags, :tag_ids,
     :avatar, :home_picture, :email, :status, :residence_country, :phone_number,
-    :post_count, :lock_version, :amount, :attempts, :action, :credit_card, :gender
+    :post_count, :lock_version, :amount, :attempts, :action, :credit_card, :gender,
+    :extra_special_company_id
 
   def initialize(options={})
     @new_record = false
@@ -113,6 +120,8 @@ class User
         Association.new(Company, association, :has_one, {})
       when :special_company
         Association.new(Company, association, :belongs_to, { conditions: { id: 1 } })
+      when :extra_special_company
+        Association.new(Company, association, :belongs_to, { conditions: proc { { id: 1 } } })
     end
   end
 
@@ -187,11 +196,11 @@ class OtherValidatingUser < User
     only_integer: true
   validates_numericality_of :amount,
     greater_than: Proc.new { |user| user.age },
-    less_than: Proc.new { |user| user.age + 100},
+    less_than: Proc.new { |user| user.age + 100 },
     only_integer: true
   validates_numericality_of :attempts,
     greater_than_or_equal_to: Proc.new { |user| user.age },
-    less_than_or_equal_to: Proc.new { |user| user.age + 100},
+    less_than_or_equal_to: Proc.new { |user| user.age + 100 },
     only_integer: true
 
   validates_format_of :country, with: /\w+/
